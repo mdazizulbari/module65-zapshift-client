@@ -31,6 +31,9 @@ const Login = () => {
             className="input"
             placeholder="Password"
           />
+          {errors.password?.type === "minLength" && (
+            <p className="text-red-500">Password must be 6 characters or longer</p>
+          )}
           {errors.password?.type === "required" && (
             <p className="text-red-500">Password is required</p>
           )}
