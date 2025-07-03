@@ -31,7 +31,7 @@ const Login = () => {
             className="input"
             placeholder="Password"
           />
-          {errors.password.type === "required" && (
+          {errors.password?.type === "required" && (
             <p className="text-red-500">Password is required</p>
           )}
 
