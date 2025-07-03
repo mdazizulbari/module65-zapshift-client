@@ -2,7 +2,11 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 const Login = () => {
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm();
 
   const onSubmit = (data) => {
     console.log(data);
@@ -27,6 +31,9 @@ const Login = () => {
             className="input"
             placeholder="Password"
           />
+          {errors.password.type === "required" && (
+            <p className="text-red-500">Password is required</p>
+          )}
 
           <div>
             <a className="link link-hover">Forgot password?</a>
