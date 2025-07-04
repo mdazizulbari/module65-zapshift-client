@@ -13,7 +13,11 @@ const Register = () => {
 
   const onSubmit = (data) => {
     console.log(data);
-    createUser(data.email, data.password);
+    createUser(data.email, data.password)
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => console.error(error));
   };
 
   return (
