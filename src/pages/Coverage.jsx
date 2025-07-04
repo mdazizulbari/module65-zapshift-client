@@ -1,21 +1,32 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, LatLngBounds } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import warehouses from '../assets/warehouses.json'; // Import warehouses data
+import React from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  // LatLngBounds,
+} from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import warehouses from "../assets/warehouses.json"; // Import warehouses data
 
 const Coverage = () => {
   // Filter active warehouses
-  const activeWarehouses = warehouses.filter(warehouse => warehouse.status === 'active');
+  const activeWarehouses = warehouses.filter(
+    (warehouse) => warehouse.status === "active"
+  );
 
   // Calculate bounds for all active warehouses
   const bounds = L.latLngBounds(
-    activeWarehouses.map(warehouse => [warehouse.latitude, warehouse.longitude])
+    activeWarehouses.map((warehouse) => [
+      warehouse.latitude,
+      warehouse.longitude,
+    ])
   );
 
   // Custom icon
   const customIcon = L.icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
   });
@@ -26,7 +37,9 @@ const Coverage = () => {
         We are available in 64 districts
       </h1>
       <div className="w-full h-[400px] rounded-lg overflow-hidden shadow-lg">
-        <MapContainer bounds={bounds} style={{ height: '100%', width: '100%' }} > // Changed to use bounds
+        <MapContainer bounds={bounds} style={{ height: "100%", width: "100%" }}>
+          {" "}
+          // Changed to use bounds
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -38,7 +51,8 @@ const Coverage = () => {
               icon={customIcon}
             >
               <Popup>
-                {warehouse.city} - {warehouse.district} <br /> Covered Areas: {warehouse.covered_area.join(', ')}
+                <strong>{warehouse.district}</strong> <br /> Covered Areas:{" "}
+                {warehouse.covered_area.join(", ")}
               </Popup>
             </Marker>
           ))}
