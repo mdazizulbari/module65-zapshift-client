@@ -52,7 +52,7 @@ const Login = () => {
             <small>
               Don't have an account?{" "}
               <Link to={"/register"} className="btn-link text-primary">
-                Login
+                Register
               </Link>
             </small>
           </p>
