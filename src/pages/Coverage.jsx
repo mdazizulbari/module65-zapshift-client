@@ -1,13 +1,29 @@
 import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import warehouses from "../assets/warehouses.json"; // Import warehouses data
 
 const Coverage = () => {
-  // Initial coordinates for Dhaka (example location)
-  const position = [23.8103, 90.4125];
+  // Filter active warehouses
+  const activeWarehouses = warehouses.filter(
+    (warehouse) => warehouse.status === "active"
+  );
 
-  // Custom icon (optional, using Leaflet's default for now)
+  // Custom hook to auto-fit map bounds to all markers
+  const SetMapBounds = () => {
+    const map = useMap();
+    const bounds = L.latLngBounds(
+      activeWarehouses.map((warehouse) => [
+        warehouse.latitude,
+        warehouse.longitude,
+      ])
+    );
+    map.fitBounds(bounds, { padding: [50, 50] }); // Add padding for better view
+    return null;
+  };
+
+  // Custom icon
   const customIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
     iconSize: [25, 41],
@@ -20,18 +36,24 @@ const Coverage = () => {
         We are available in 64 districts
       </h1>
       <div className="w-full h-[400px] rounded-lg overflow-hidden shadow-lg">
-        <MapContainer
-          center={position}
-          zoom={7}
-          style={{ height: "100%", width: "100%" }}
-        >
+        <MapContainer style={{ height: "100%", width: "100%" }}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={position} icon={customIcon}>
-            <Popup>Dhaka - Our Coverage Starts Here!</Popup>
-          </Marker>
+          {activeWarehouses.map((warehouse, index) => (
+            <Marker
+              key={index}
+              position={[warehouse.latitude, warehouse.longitude]}
+              icon={customIcon}
+            >
+              <Popup>
+                {warehouse.city} - {warehouse.district} <br /> Covered Areas:{" "}
+                {warehouse.covered_area.join(", ")}
+              </Popup>
+            </Marker>
+          ))}
+          <SetMapBounds /> // Add custom hook to fit bounds
         </MapContainer>
       </div>
     </div>
