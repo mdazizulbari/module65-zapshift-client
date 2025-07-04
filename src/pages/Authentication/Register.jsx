@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../hooks/useAuth";
+import { Link } from "react-router";
 
 const Register = () => {
   const { createUser } = useAuth();
@@ -51,8 +52,18 @@ const Register = () => {
           <div>
             <a className="link link-hover">Forgot password?</a>
           </div>
-          <button className="btn w-fit btn-neutral mt-4">Register</button>
+          <button className="btn btn-primary text-black w-fit btn-neutral mt-4">
+            Register
+          </button>
         </fieldset>
+        <p>
+          <small>
+            Already have an account?{" "}
+            <Link to={"/login"} className="text-primary">
+              Login
+            </Link>
+          </small>
+        </p>
       </form>
     </div>
   );
