@@ -22,10 +22,10 @@ const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const logOut=()=>{
-    setLoading(true)
-    return signOut(auth)
-  }
+  const logOut = () => {
+    setLoading(true);
+    return signOut(auth);
+  };
 
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -37,7 +37,7 @@ const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const authInfo = { user, loading, createUser, signIn };
+  const authInfo = { user, loading, createUser, signIn, logOut };
 
   return <AuthContext value={authInfo}>{children}</AuthContext>;
 };
