@@ -13,37 +13,42 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <form action="" onSubmit={handleSubmit(onSubmit)}>
-        <fieldset className="fieldset">
-          <label className="label">Email</label>
-          <input
-            type="email"
-            className="input"
-            {...register("email")}
-            placeholder="Email"
-          />
+    <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+      <div className="card-body">
+        <h1 className="text-5xl font-bold">Login now!</h1>
+        <form action="" onSubmit={handleSubmit(onSubmit)}>
+          <fieldset className="fieldset">
+            <label className="label">Email</label>
+            <input
+              type="email"
+              className="input"
+              {...register("email")}
+              placeholder="Email"
+            />
 
-          <label className="label">Password</label>
-          <input
-            type="password"
-            {...register("password", { required: true, minLength: 6 })}
-            className="input"
-            placeholder="Password"
-          />
-          {errors.password?.type === "minLength" && (
-            <p className="text-red-500">Password must be 6 characters or longer</p>
-          )}
-          {errors.password?.type === "required" && (
-            <p className="text-red-500">Password is required</p>
-          )}
+            <label className="label">Password</label>
+            <input
+              type="password"
+              {...register("password", { required: true, minLength: 6 })}
+              className="input"
+              placeholder="Password"
+            />
+            {errors.password?.type === "minLength" && (
+              <p className="text-red-500">
+                Password must be 6 characters or longer
+              </p>
+            )}
+            {errors.password?.type === "required" && (
+              <p className="text-red-500">Password is required</p>
+            )}
 
-          <div>
-            <a className="link link-hover">Forgot password?</a>
-          </div>
-          <button className="btn w-fit btn-neutral mt-4">Login</button>
-        </fieldset>
-      </form>
+            <div>
+              <a className="link link-hover">Forgot password?</a>
+            </div>
+            <button className="btn w-fit btn-neutral mt-4">Login</button>
+          </fieldset>
+        </form>
+      </div>
     </div>
   );
 };
