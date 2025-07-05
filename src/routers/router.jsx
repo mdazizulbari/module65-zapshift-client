@@ -4,7 +4,7 @@ import Home from "../pages/home/Home";
 import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/Authentication/Login";
 import Register from "../pages/Authentication/Register";
-import Coverage from "../pages/Coverage";
+import Coverage from "../pages/coverage/Coverage";
 
 export const router = createBrowserRouter([
   {
