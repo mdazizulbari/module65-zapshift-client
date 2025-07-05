@@ -134,7 +134,7 @@ const SendParcel = () => {
 
         <div className="mt-8 text-center">
           <button
-            className="btn btn-primary px-8"
+            className="btn btn-primary px-8 text-black"
             onClick={handleSubmit(onSubmit)}
           >
             Submit
