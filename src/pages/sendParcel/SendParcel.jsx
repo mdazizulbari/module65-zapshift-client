@@ -16,11 +16,22 @@ const SendParcel = () => {
   const [deliveryCost, setDeliveryCost] = useState(null);
   const { user } = useAuth();
 
+  const generateTrackingID = () => {
+    const date = new Date();
+    const datePart = date.toISOString().split("T")[0].replace(/-/g, "");
+    const rand = Math.random().toString(36).substring(2, 7).toUpperCase();
+    return `PCL-${datePart}-${rand}`;
+  };
+
   const handleConfirm = (data, cost) => {
     const parcelInfo = {
       ...data,
       deliveryCost: cost,
+      userEmail: user?.email || "anonymous",
       creation_date: new Date().toISOString(),
+      delivery_status: "not_collected",
+      payment_status: "unpaid",
+      tracking_id: generateTrackingID(),
     };
     console.log("Saved:", parcelInfo);
     Swal.fire({
