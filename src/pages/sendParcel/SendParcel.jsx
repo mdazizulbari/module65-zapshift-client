@@ -15,6 +15,17 @@ const SendParcel = () => {
   const selectedType = watch("type"); // 😊 used to conditionally show weight
   const [deliveryCost, setDeliveryCost] = useState(null);
 
+  const handleConfirm = (data, cost) => {
+    const parcelInfo = {
+      ...data,
+      deliveryCost: cost,
+      creation_date: new Date().toISOString(),
+    };
+    console.log("Saved:", parcelInfo);
+    toast.success("Parcel info saved ✅");
+    // ✅ send `parcelInfo` to your DB here
+  };
+
   const onSubmit = (data) => {
     const cost = calculateCost(data);
     setDeliveryCost(cost);
@@ -33,30 +44,30 @@ const SendParcel = () => {
         position: "bottom-center", // 🍥 ensures bottom-middle
         autoClose: false, // 🛑 won't disappear
         hideProgressBar: true,
-        closeOnClick: false,
+        closeOnClick: true,
         draggable: false,
         pauseOnHover: true,
       }
     );
   };
 
-  const handleConfirm = (data, cost) => {
-    const parcelInfo = {
-      ...data,
-      deliveryCost: cost,
-      creation_date: new Date().toISOString(),
-    };
-    console.log("Saved:", parcelInfo);
-    toast.success("Parcel info saved ✅");
-    // ✅ send `parcelInfo` to your DB here
-  };
-
   const calculateCost = (data) => {
-    const base = data.type === "Document" ? 30 : 50;
-    const weightCost = data.parcelWeight
-      ? parseFloat(data.parcelWeight) * 10
-      : 0;
-    return base + weightCost;
+    const isDoc = data.type === "Document";
+    const sameRegion = data.senderRegion === data.receiverRegion;
+
+    if (isDoc) {
+      return sameRegion ? 60 : 80;
+    }
+
+    const weight = parseFloat(data.parcelWeight) || 0;
+
+    if (weight <= 3) {
+      return sameRegion ? 110 : 150;
+    }
+
+    const extraPerKg = weight - 3;
+    const extraCost = extraPerKg * 40;
+    return sameRegion ? 110 + extraCost : 150 + extraCost + 40;
   };
 
   return (
