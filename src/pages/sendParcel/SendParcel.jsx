@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLoaderData } from "react-router";
 import Swal from "sweetalert2";
+import useAuth from "../../hooks/useAuth";
 
 const SendParcel = () => {
   const {
@@ -13,6 +14,7 @@ const SendParcel = () => {
   const locationData = useLoaderData();
   const selectedType = watch("type"); // 😊 used to conditionally show weight
   const [deliveryCost, setDeliveryCost] = useState(null);
+  const { user } = useAuth();
 
   const handleConfirm = (data, cost) => {
     const parcelInfo = {
@@ -30,39 +32,51 @@ const SendParcel = () => {
     });
   };
 
-const onSubmit = (data) => {
-  const isDocument = data.type === "Document";
-  const weight = Number(data.parcelWeight) || 0;
+  const onSubmit = (data) => {
+    const isDocument = data.type === "Document";
+    const weight = Number(data.parcelWeight) || 0;
 
-  const sameDistrict =
-    data.senderRegion === data.receiverRegion &&
-    data.senderWarehouse === data.receiverWarehouse;
+    const sameDistrict =
+      data.senderRegion === data.receiverRegion &&
+      data.senderWarehouse === data.receiverWarehouse;
 
-  let baseCost, extraWeightCost = 0, extraOutsideCost = 0;
+    let baseCost,
+      extraWeightCost = 0,
+      extraOutsideCost = 0;
 
-  if (isDocument) {
-    baseCost = sameDistrict ? 60 : 80;
-  } else {
-    baseCost = sameDistrict ? 110 : 150;
-    if (weight > 3) {
-      extraWeightCost = Math.ceil(weight - 3) * 40;
-      if (!sameDistrict) {
-        extraOutsideCost = 40; // Fixed extra if outside district and >3kg
+    if (isDocument) {
+      baseCost = sameDistrict ? 60 : 80;
+    } else {
+      baseCost = sameDistrict ? 110 : 150;
+      if (weight > 3) {
+        extraWeightCost = Math.ceil(weight - 3) * 40;
+        if (!sameDistrict) {
+          extraOutsideCost = 40; // Fixed extra if outside district and >3kg
+        }
       }
     }
-  }
 
-  const total = baseCost + extraWeightCost + extraOutsideCost;
+    const total = baseCost + extraWeightCost + extraOutsideCost;
 
-  const breakdownHTML = `
+    const breakdownHTML = `
     <div style="font-size: 1rem; text-align: left;">
       <b>Parcel Type:</b> ${isDocument ? "Document" : "Non-Document"}<br/>
-      <b>Distance:</b> ${sameDistrict ? "Within District" : "Outside District"}<br/>
+      <b>Distance:</b> ${
+        sameDistrict ? "Within District" : "Outside District"
+      }<br/>
       ${!isDocument ? `<b>Weight:</b> ${weight} kg<br/>` : ""}
       <hr style="margin: 10px 0"/>
       <b>Base Cost:</b> ৳${baseCost}<br/>
-      ${extraWeightCost ? `<b>Extra Weight (৳40/kg over 3kg):</b> ৳${extraWeightCost}<br/>` : ""}
-      ${extraOutsideCost ? `<b>Outside District Fee:</b> ৳${extraOutsideCost}<br/>` : ""}
+      ${
+        extraWeightCost
+          ? `<b>Extra Weight (৳40/kg over 3kg):</b> ৳${extraWeightCost}<br/>`
+          : ""
+      }
+      ${
+        extraOutsideCost
+          ? `<b>Outside District Fee:</b> ৳${extraOutsideCost}<br/>`
+          : ""
+      }
       <hr style="margin: 10px 0"/>
       <b>Total Estimated Cost:</b> ৳${total}
       <br/><br/>
@@ -76,25 +90,24 @@ const onSubmit = (data) => {
     </div>
   `;
 
-  Swal.fire({
-    title: "📦 Review Parcel Cost",
-    html: breakdownHTML,
-    icon: "info",
-    showCancelButton: true,
-    confirmButtonText: "✅ Confirm",
-    cancelButtonText: "✏️ Edit",
-    confirmButtonColor: "#22c55e",
-    cancelButtonColor: "#6b7280",
-    reverseButtons: true,
-    focusCancel: true,
-    width: 600,
-  }).then((result) => {
-    if (result.isConfirmed) {
-      handleConfirm(data, total);
-    }
-  });
-};
-
+    Swal.fire({
+      title: "📦 Review Parcel Cost",
+      html: breakdownHTML,
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "✅ Confirm",
+      cancelButtonText: "✏️ Edit",
+      confirmButtonColor: "#22c55e",
+      cancelButtonColor: "#6b7280",
+      reverseButtons: true,
+      focusCancel: true,
+      width: 600,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleConfirm(data, total);
+      }
+    });
+  };
 
   const calculateCost = (data) => {
     const isDocument = data.type === "Document";
