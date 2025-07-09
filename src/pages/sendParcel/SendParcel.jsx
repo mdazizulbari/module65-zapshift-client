@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useLoaderData } from "react-router";
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const SendParcel = () => {
   const {
@@ -11,10 +12,11 @@ const SendParcel = () => {
     watch,
     formState: { errors },
   } = useForm();
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const locationData = useLoaderData();
   const selectedType = watch("type"); // 😊 used to conditionally show weight
   const [deliveryCost, setDeliveryCost] = useState(null);
-  const { user } = useAuth();
 
   const generateTrackingID = () => {
     const date = new Date();
@@ -34,13 +36,20 @@ const SendParcel = () => {
       tracking_id: generateTrackingID(),
     };
     console.log("Saved:", parcelInfo);
-    Swal.fire({
-      icon: "success",
-      title: "Parcel Confirmed",
-      text: "Your parcel has been saved successfully!",
-      timer: 2000,
-      showConfirmButton: false,
-    });
+
+    // save data to server
+    axiosSecure
+      .post("parcels", parcelInfo)
+      .then((res) => console.log(res.data))
+      .catch((err) => console.error("❌ Parcel save failed", err));
+
+    // Swal.fire({
+    //   icon: "success",
+    //   title: "Parcel Confirmed",
+    //   text: "Your parcel has been saved successfully!",
+    //   timer: 2000,
+    //   showConfirmButton: false,
+    // });
   };
 
   const onSubmit = (data) => {
@@ -103,13 +112,16 @@ const SendParcel = () => {
 
     Swal.fire({
       title: "📦 Review Parcel Cost",
-      html: breakdownHTML,
+      html: breakdownHTML.replace(
+        /<b>Total Estimated Cost:<\/b> ৳(\d+)/,
+        `<b style="color:#10b981;font-size:1.2rem;">💰 Total Estimated Cost:</b> <span style="color:#16a34a;font-weight:bold;font-size:1.2rem;">৳$1</span>`
+      ),
       icon: "info",
       showCancelButton: true,
-      confirmButtonText: "✅ Confirm",
+      confirmButtonText: "💳 Proceed to Payment",
       cancelButtonText: "✏️ Edit",
-      confirmButtonColor: "#22c55e",
-      cancelButtonColor: "#6b7280",
+      confirmButtonColor: "#10b981", // emerald-500
+      cancelButtonColor: "#6b7280", // gray-500
       reverseButtons: true,
       focusCancel: true,
       width: 600,
@@ -145,93 +157,95 @@ const SendParcel = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4">
-      <div className="card bg-base-100 shadow-xl p-6">
-        <h1 className="text-4xl font-bold text-center">Add Parcel</h1>
-        <hr className="my-4 border-base-300" />{" "}
-        {/* Changed to border-base-300 */}
-        <h2 className="text-xl font-semibold mb-2">
-          Enter your parcel details
-        </h2>
-        {/* Parcel Type */}
-        <div className="flex gap-6 mb-4">
-          <label className="label cursor-pointer">
-            <input
-              {...register("type", { required: true })}
-              type="radio"
-              name="type"
-              value="Document"
-              className="radio"
-            />
-            <span className="label-text ml-2">Document</span>
-          </label>
-
-          <label className="label cursor-pointer">
-            <input
-              {...register("type", { required: true })}
-              type="radio"
-              name="type"
-              value="Not-Document"
-              className="radio"
-            />
-            <span className="label-text ml-2">Not-document</span>
-          </label>
-        </div>
-        {/* Parcel Name & Weight */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="label">Parcel Name</label>
-            <input
-              {...register("parcelName", { required: true })}
-              type="text"
-              className="input input-bordered w-full"
-            />
-          </div>
-
-          {/* 🧠 Only show weight when non-document */}
-          {selectedType === "Not-Document" && (
-            <div>
-              <label className="label">Parcel Weight (kg)</label>
+      <form action="" onSubmit={handleSubmit(onSubmit)}>
+        <div className="card bg-base-100 shadow-xl p-6">
+          <h1 className="text-4xl font-bold text-center">Add Parcel</h1>
+          <hr className="my-4 border-base-300" />{" "}
+          {/* Changed to border-base-300 */}
+          <h2 className="text-xl font-semibold mb-2">
+            Enter your parcel details
+          </h2>
+          {/* Parcel Type */}
+          <div className="flex gap-6 mb-4">
+            <label className="label cursor-pointer">
               <input
-                {...register("parcelWeight")}
-                type="number"
-                step="0.01"
+                {...register("type", { required: true })}
+                type="radio"
+                name="type"
+                value="Document"
+                className="radio"
+              />
+              <span className="label-text ml-2">Document</span>
+            </label>
+
+            <label className="label cursor-pointer">
+              <input
+                {...register("type", { required: true })}
+                type="radio"
+                name="type"
+                value="Not-Document"
+                className="radio"
+              />
+              <span className="label-text ml-2">Not-document</span>
+            </label>
+          </div>
+          {/* Parcel Name & Weight */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="label">Parcel Name</label>
+              <input
+                {...register("parcelName", { required: true })}
+                type="text"
                 className="input input-bordered w-full"
               />
             </div>
-          )}
-        </div>
-        <hr className="my-6 border-base-300" /> {/* Changed as above */}
-        {/* Sender & Receiver */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="font-bold text-lg mb-2">Sender Details</h3>
-            <SenderReceiverFields
-              prefix="sender"
-              register={register}
-              errors={errors}
-              locationData={locationData}
-            />
-          </div>
 
-          <div>
-            <h3 className="font-bold text-lg mb-2">Receiver Details</h3>
-            <SenderReceiverFields
-              prefix="receiver"
-              register={register}
-              errors={errors}
-              locationData={locationData}
-            />
+            {/* 🧠 Only show weight when non-document */}
+            {selectedType === "Not-Document" && (
+              <div>
+                <label className="label">Parcel Weight (kg)</label>
+                <input
+                  {...register("parcelWeight")}
+                  type="number"
+                  step="0.01"
+                  className="input input-bordered w-full"
+                />
+              </div>
+            )}
+          </div>
+          <hr className="my-6 border-base-300" /> {/* Changed as above */}
+          {/* Sender & Receiver */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-bold text-lg mb-2">Sender Details</h3>
+              <SenderReceiverFields
+                prefix="sender"
+                register={register}
+                errors={errors}
+                locationData={locationData}
+              />
+            </div>
+
+            <div>
+              <h3 className="font-bold text-lg mb-2">Receiver Details</h3>
+              <SenderReceiverFields
+                prefix="receiver"
+                register={register}
+                errors={errors}
+                locationData={locationData}
+              />
+            </div>
+          </div>
+          <div className="mt-8 text-center">
+            <button
+              className="btn btn-primary px-8 text-black" // 🖤 black text
+              type="submit"
+            >
+              Submit
+            </button>
           </div>
         </div>
-        <div className="mt-8 text-center">
-          <button
-            className="btn btn-primary px-8 text-black" // 🖤 black text
-            onClick={handleSubmit(onSubmit)}
-          >
-            Submit
-          </button>
-        </div>
-      </div>
+      </form>
     </div>
   );
 };
