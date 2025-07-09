@@ -35,22 +35,33 @@ const SendParcel = () => {
     setDeliveryCost(cost);
 
     Swal.fire({
-      title: "Estimated Delivery Cost",
+      title: "Confirm Parcel Submission",
       html: `
-      <p class="text-lg font-semibold">৳${cost}</p>
-      <button id="confirm-btn" class="swal2-confirm swal2-styled" style="margin-top: 15px;">
-        Confirm
-      </button>
+      <div style="font-size: 1.2rem">
+        <b>Estimated Delivery Cost:</b> ৳${cost}<br/>
+        Are you sure you want to continue?
+      </div>
     `,
-      showConfirmButton: false,
-      allowOutsideClick: true,
-      didOpen: () => {
-        const confirmBtn = Swal.getPopup().querySelector("#confirm-btn");
-        confirmBtn.addEventListener("click", () => {
-          handleConfirm(data, cost);
-          Swal.close();
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Confirm",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#22c55e", // 🟢 green
+      cancelButtonColor: "#ef4444", // 🔴 red
+      reverseButtons: true,
+      focusCancel: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleConfirm(data, cost);
+      } else {
+        Swal.fire({
+          icon: "info",
+          title: "Cancelled",
+          text: "No worries! Your data is safe.",
+          timer: 1500,
+          showConfirmButton: false,
         });
-      },
+      }
     });
   };
 
