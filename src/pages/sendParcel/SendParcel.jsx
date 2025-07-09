@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLoaderData } from "react-router";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
 
 const SendParcel = () => {
   const {
@@ -22,33 +21,37 @@ const SendParcel = () => {
       creation_date: new Date().toISOString(),
     };
     console.log("Saved:", parcelInfo);
-    toast.success("Parcel info saved ✅");
-    // ✅ send `parcelInfo` to your DB here
+    Swal.fire({
+      icon: "success",
+      title: "Parcel Confirmed ✅",
+      text: "Your parcel has been saved successfully!",
+      timer: 2000,
+      showConfirmButton: false,
+    });
   };
 
   const onSubmit = (data) => {
     const cost = calculateCost(data);
     setDeliveryCost(cost);
 
-    toast(
-      <div>
-        <p className="font-bold">Estimated Delivery Cost: ৳{cost}</p>
-        <button
-          className="btn btn-sm mt-2 btn-success"
-          onClick={() => handleConfirm(data, cost)}
-        >
-          Confirm
-        </button>
-      </div>,
-      {
-        position: "bottom-center", // 🍥 ensures bottom-middle
-        autoClose: false, // 🛑 won't disappear
-        hideProgressBar: true,
-        closeOnClick: true,
-        draggable: false,
-        pauseOnHover: true,
-      }
-    );
+    Swal.fire({
+      title: "Estimated Delivery Cost",
+      html: `
+      <p class="text-lg font-semibold">৳${cost}</p>
+      <button id="confirm-btn" class="swal2-confirm swal2-styled" style="margin-top: 15px;">
+        Confirm
+      </button>
+    `,
+      showConfirmButton: false,
+      allowOutsideClick: true,
+      didOpen: () => {
+        const confirmBtn = Swal.getPopup().querySelector("#confirm-btn");
+        confirmBtn.addEventListener("click", () => {
+          handleConfirm(data, cost);
+          Swal.close();
+        });
+      },
+    });
   };
 
   const calculateCost = (data) => {
