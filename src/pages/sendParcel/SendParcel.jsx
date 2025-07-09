@@ -23,7 +23,7 @@ const SendParcel = () => {
     console.log("Saved:", parcelInfo);
     Swal.fire({
       icon: "success",
-      title: "Parcel Confirmed ✅",
+      title: "Parcel Confirmed",
       text: "Your parcel has been saved successfully!",
       timer: 2000,
       showConfirmButton: false,
@@ -34,20 +34,48 @@ const SendParcel = () => {
     const cost = calculateCost(data);
     setDeliveryCost(cost);
 
+    const isDocument = data.type === "Document";
+    const weight = Number(data.parcelWeight) || 0;
+    const sameDistrict =
+      data.senderRegion === data.receiverRegion &&
+      data.senderWarehouse === data.receiverWarehouse;
+
+    // 🧾 Conditionally render weight line
+    const weightLine = !isDocument ? `<b>Weight:</b> ${weight} kg<br/>` : "";
+
+    // 🧮 Cost breakdown
+    const breakdownHTML = `
+    <div style="font-size: 1rem; text-align: left;">
+      <b>Parcel Type:</b> ${isDocument ? "Document" : "Non-Document"}<br/>
+      ${weightLine}
+      <b>Distance:</b> ${
+        sameDistrict ? "Within District" : "Outside District"
+      }<br/>
+      <hr style="margin: 8px 0"/>
+      <b>Base Cost:</b> ৳${
+        isDocument ? (sameDistrict ? 60 : 80) : sameDistrict ? 110 : 150
+      }<br/>
+      ${
+        !isDocument && weight > 3
+          ? `<b>Extra Weight:</b> ৳${Math.ceil(weight - 3) * 40}<br/>` +
+            (!sameDistrict ? `<b>Outside District Extra:</b> ৳40<br/>` : "")
+          : ""
+      }
+      <hr style="margin: 8px 0"/>
+      <b>Total:</b> ৳${cost}
+    </div>
+  `;
+
+    // 🧠 Confirmation Alert
     Swal.fire({
       title: "Confirm Parcel Submission",
-      html: `
-      <div style="font-size: 1.2rem">
-        <b>Estimated Delivery Cost:</b> ৳${cost}<br/>
-        Are you sure you want to continue?
-      </div>
-    `,
+      html: breakdownHTML,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes, Confirm",
       cancelButtonText: "Cancel",
-      confirmButtonColor: "#22c55e", // 🟢 green
-      cancelButtonColor: "#ef4444", // 🔴 red
+      confirmButtonColor: "#22c55e",
+      cancelButtonColor: "#ef4444",
       reverseButtons: true,
       focusCancel: true,
     }).then((result) => {
@@ -57,7 +85,7 @@ const SendParcel = () => {
         Swal.fire({
           icon: "info",
           title: "Cancelled",
-          text: "No worries! Your data is safe.",
+          text: "No action was taken.",
           timer: 1500,
           showConfirmButton: false,
         });
@@ -66,22 +94,26 @@ const SendParcel = () => {
   };
 
   const calculateCost = (data) => {
-    const isDoc = data.type === "Document";
-    const sameRegion = data.senderRegion === data.receiverRegion;
+    const isDocument = data.type === "Document";
+    const weight = Number(data.parcelWeight) || 0;
 
-    if (isDoc) {
-      return sameRegion ? 60 : 80;
+    const sameDistrict =
+      data.senderRegion === data.receiverRegion &&
+      data.senderWarehouse === data.receiverWarehouse;
+
+    if (isDocument) {
+      return sameDistrict ? 60 : 80;
     }
 
-    const weight = parseFloat(data.parcelWeight) || 0;
+    // Non-document base cost
+    let cost = sameDistrict ? 110 : 150;
 
-    if (weight <= 3) {
-      return sameRegion ? 110 : 150;
+    if (weight > 3) {
+      cost += Math.ceil(weight - 3) * 40;
+      if (!sameDistrict) cost += 40; // extra for outside district heavy items
     }
 
-    const extraPerKg = weight - 3;
-    const extraCost = extraPerKg * 40;
-    return sameRegion ? 110 + extraCost : 150 + extraCost + 40;
+    return cost;
   };
 
   return (
