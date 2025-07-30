@@ -40,16 +40,20 @@ const SendParcel = () => {
     // save data to server
     axiosSecure
       .post("parcels", parcelInfo)
-      .then((res) => console.log(res.data))
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.insertedId) {
+          Swal.fire({
+            // TODO: redirect to the payment page
+            icon: "success",
+            title: "Parcel Confirmed",
+            text: "Your parcel has been saved successfully!",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        }
+      })
       .catch((err) => console.error("❌ Parcel save failed", err));
-
-    // Swal.fire({
-    //   icon: "success",
-    //   title: "Parcel Confirmed",
-    //   text: "Your parcel has been saved successfully!",
-    //   timer: 2000,
-    //   showConfirmButton: false,
-    // });
   };
 
   const onSubmit = (data) => {
