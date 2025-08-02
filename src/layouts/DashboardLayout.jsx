@@ -1,4 +1,11 @@
 import React from "react";
+import {
+  FaHome,
+  FaBox,
+  FaMoneyCheckAlt,
+  FaMapMarkerAlt,
+  FaUserEdit,
+} from "react-icons/fa";
 import { NavLink, Outlet } from "react-router";
 import ProFastLogo from "../pages/shared/ProFastLogo";
 
@@ -43,24 +50,36 @@ const DashboardLayout = () => {
             className="drawer-overlay"
           ></label>
           <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-            {/* Sidebar content here */}
             <ProFastLogo />
             <li>
-              <a>Home</a>
+              <NavLink to="/">
+                <FaHome className="mr-2" />
+                Home
+              </NavLink>
             </li>
             <li>
-              <NavLink to={"/dashboard/myParcels"}>My Parcels</NavLink>
+              <NavLink to="/dashboard/myParcels">
+                <FaBox className="mr-2" />
+                My Parcels
+              </NavLink>
             </li>
             <li>
-              <NavLink to={"/dashboard/paymentHistory"}>
+              <NavLink to="/dashboard/paymentHistory">
+                <FaMoneyCheckAlt className="mr-2" />
                 Payment History
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/dashboard/track"}>Track a Package</NavLink>
+              <NavLink to="/dashboard/track">
+                <FaMapMarkerAlt className="mr-2" />
+                Track a Package
+              </NavLink>
             </li>
             <li>
-              <NavLink to={"/dashboard/profile"}>Update Profile</NavLink>
+              <NavLink to="/dashboard/profile">
+                <FaUserEdit className="mr-2" />
+                Update Profile
+              </NavLink>
             </li>
           </ul>
         </div>
