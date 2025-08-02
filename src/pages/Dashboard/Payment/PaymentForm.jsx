@@ -1,7 +1,8 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import Swal from "sweetalert2";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from "../../../hooks/useAuth";
 
@@ -10,6 +11,7 @@ const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [error, setError] = useState();
   const [processing, setProcessing] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
@@ -86,7 +88,33 @@ const PaymentForm = () => {
           setError(null);
           setProcessing(false);
           setSucceeded(true);
+          console.log("Payment Succeeded");
           // step-4 mark parcel paid also create payment history
+          const paymentData = {
+            parcelId,
+            email: user.email,
+            amount,
+            transactionId: result.paymentIntent.id,
+            paymentMethod: result.paymentIntent.payment_method_types,
+          };
+
+          const paymentRes = await axiosSecure.post("/payments", paymentData);
+          if (paymentRes.data.insertedId) {
+            const transactionId = paymentData.transactionId;
+            Swal.fire({
+              title: "✅ Payment Successful!",
+              text: `Transaction ID: ${transactionId}`,
+              icon: "success",
+              confirmButtonText: "Go to My Parcels",
+              customClass: {
+                popup: "text-left", // Optional: aligns text to left
+              },
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/dashboard/myParcels");
+              }
+            });
+          }
         }
       }
     }
