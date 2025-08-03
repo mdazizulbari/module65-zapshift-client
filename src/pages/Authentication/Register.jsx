@@ -5,10 +5,12 @@ import { Link } from "react-router";
 import SocialLogin from "./SocialLogin";
 import axios from "axios";
 import { useState } from "react";
+import useAxios from "../../hooks/useAxios";
 
 const Register = () => {
   const { createUser, updateUserProfile } = useAuth();
   const [profilePic, setProfilePic] = useState();
+  const axiosInstance = useAxios();
   const {
     register,
     formState: { errors },
@@ -18,10 +20,18 @@ const Register = () => {
   const onSubmit = (data) => {
     console.log(data);
     createUser(data.email, data.password)
-      .then((result) => {
+      .then(async (result) => {
         console.log(result.user);
 
         // update user info in database
+        const userInfo = {
+          email: data.email,
+          role: "user", //default role
+          created_at: new Date().toISOString(),
+          last_log_in: new Date().toISOString(),
+        };
+        const userRes = await axiosInstance.post("/users", userInfo);
+        console.log(userRes.data);
 
         // update user profile in firebase
         const userProfile = {
