@@ -39,7 +39,7 @@ const SendParcel = () => {
 
     // save data to server
     axiosSecure
-      .post("parcels", parcelInfo)
+      .post("/parcels", parcelInfo)
       .then((res) => {
         console.log(res.data);
         if (res.data.insertedId) {
