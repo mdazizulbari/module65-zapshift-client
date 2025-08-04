@@ -16,7 +16,6 @@ const SendParcel = () => {
   const axiosSecure = useAxiosSecure();
   const locationData = useLoaderData();
   const selectedType = watch("type"); // 😊 used to conditionally show weight
-  const [deliveryCost, setDeliveryCost] = useState(null);
 
   const generateTrackingID = () => {
     const date = new Date();
@@ -136,29 +135,6 @@ const SendParcel = () => {
     });
   };
 
-  const calculateCost = (data) => {
-    const isDocument = data.type === "Document";
-    const weight = Number(data.parcelWeight) || 0;
-
-    const sameDistrict =
-      data.senderRegion === data.receiverRegion &&
-      data.senderWarehouse === data.receiverWarehouse;
-
-    if (isDocument) {
-      return sameDistrict ? 60 : 80;
-    }
-
-    // Non-document base cost
-    let cost = sameDistrict ? 110 : 150;
-
-    if (weight > 3) {
-      cost += Math.ceil(weight - 3) * 40;
-      if (!sameDistrict) cost += 40; // extra for outside district heavy items
-    }
-
-    return cost;
-  };
-
   return (
     <div className="max-w-7xl mx-auto p-4">
       <form action="" onSubmit={handleSubmit(onSubmit)}>
@@ -254,7 +230,7 @@ const SendParcel = () => {
   );
 };
 
-const SenderReceiverFields = ({ prefix, register, errors, locationData }) => {
+const SenderReceiverFields = ({ prefix, register,  locationData }) => {
   const [region, setRegion] = useState(""); // 🗺 track region change
 
   return (
