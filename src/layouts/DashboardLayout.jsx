@@ -1,10 +1,11 @@
-import React from "react";
 import {
   FaHome,
   FaBox,
   FaMoneyCheckAlt,
   FaMapMarkerAlt,
   FaUserEdit,
+  FaCheckCircle,
+  FaClock
 } from "react-icons/fa";
 import { NavLink, Outlet } from "react-router";
 import ProFastLogo from "../pages/shared/ProFastLogo";
@@ -40,15 +41,11 @@ const DashboardLayout = () => {
             </div>
             <div className="mx-2 flex-1 px-2 lg:hidden">Dashboard</div>
           </div>
-          {/* Page content here */}
+          {/* Page content */}
           <Outlet />
         </div>
         <div className="drawer-side">
-          <label
-            htmlFor="my-drawer-2"
-            aria-label="close sidebar"
-            className="drawer-overlay"
-          ></label>
+          <label htmlFor="my-drawer-2" className="drawer-overlay" />
           <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
             <ProFastLogo />
             <li>
@@ -79,6 +76,17 @@ const DashboardLayout = () => {
               <NavLink to="/dashboard/profile">
                 <FaUserEdit className="mr-2" />
                 Update Profile
+              </NavLink>
+            </li>
+            {/* New Links */}
+            <li>
+              <NavLink to="/dashboard/active-riders">
+                <FaCheckCircle className="mr-2" /> Active Riders
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/dashboard/pending-riders">
+                <FaClock className="mr-2" /> Pending Riders
               </NavLink>
             </li>
           </ul>
