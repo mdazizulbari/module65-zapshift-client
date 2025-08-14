@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaEye, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -10,10 +10,7 @@ const PendingRiders = () => {
   const modalRef = useRef();
   const [selectedRider, setSelectedRider] = useState(null);
 
-  const {
-    data: riders = [],
-    isPending,
-  } = useQuery({
+  const { data: riders = [], isPending } = useQuery({
     queryKey: ["pending-riders"],
     queryFn: async () => {
       const res = await axiosSecure.get("/riders/pending");
@@ -62,14 +59,24 @@ const PendingRiders = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         rejectMutation.mutate(id);
-        Swal.fire("🗑️ Rejected", "The application has been rejected.", "success");
+        Swal.fire(
+          "🗑️ Rejected",
+          "The application has been rejected.",
+          "success"
+        );
       }
     });
   };
 
+  // to view details of the rider
+  useEffect(() => {
+    if (selectedRider && modalRef.current) {
+      modalRef.current.showModal();
+    }
+  }, [selectedRider]);
+
   const openDetails = (rider) => {
     setSelectedRider(rider);
-    modalRef.current.showModal();
   };
 
   const closeModal = () => {
