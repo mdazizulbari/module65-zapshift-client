@@ -17,6 +17,7 @@ const PendingRiders = () => {
       return res.data;
     },
   });
+  // console.log(riders)
 
   const approveMutation = useMutation({
     mutationFn: (id) => axiosSecure.patch(`/riders/${id}/approve`),
@@ -120,14 +121,14 @@ const PendingRiders = () => {
                       <FaEye />
                     </button>
                     <button
-                      onClick={() => confirmApprove(r._id)}
+                      onClick={() => confirmApprove(r._id, r.email)}
                       className="btn btn-sm btn-success btn-outline"
                       disabled={approveMutation.isPending}
                     >
                       <FaCheckCircle />
                     </button>
                     <button
-                      onClick={() => confirmReject(r._id)}
+                      onClick={() => confirmReject(r._id, r.email)}
                       className="btn btn-sm btn-error btn-outline"
                       disabled={rejectMutation.isPending}
                     >

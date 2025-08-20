@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
         loader: async () => {
-          const res = await fetch(`src/assets/warehouses.json`);
+          const res = await fetch(`/warehouses.json`);
           return res.json();
         },
       },
