@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import warehouseData from "../../assets/warehouses.json";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -11,7 +10,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-function MapFly({ position }) {
+function MapFly({ position, warehouseData }) {
   const map = useMap();
   useEffect(() => {
     if (position) map.flyTo(position, 10);

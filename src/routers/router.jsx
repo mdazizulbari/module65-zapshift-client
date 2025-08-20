@@ -23,7 +23,14 @@ export const router = createBrowserRouter([
     // loader: loadRootData,
     children: [
       { index: true, element: <Home /> },
-      { path: "coverage", element: <Coverage /> },
+      {
+        path: "coverage",
+        element: <Coverage />,
+        loader: async () => {
+          const res = await fetch(`/warehouses.json`);
+          return res.json();
+        },
+      },
       {
         path: "beARider",
         element: (
